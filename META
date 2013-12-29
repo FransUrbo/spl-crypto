@@ -2,5 +2,5 @@ Meta:         1
 Name:         spl
 Branch:       1.0
 Version:      0.6.2
-Release:      1.20131220_crypto
+Release:      1.20131220.crypto
 Release-Tags: relext
