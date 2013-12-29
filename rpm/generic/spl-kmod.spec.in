@@ -160,6 +160,9 @@ for kernel_version in %{?kernel_versions}; do
     cd ..
 done
 chmod u+x ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}/*/extra/*/*/*
+mkdir -p ${RPM_BUILD_ROOT}/usr/src/%{kernels}
+mv ${RPM_BUILD_ROOT}/usr/src/%{module}-%{version}/* ${RPM_BUILD_ROOT}/usr/src/%{kernels}/
+mv ${RPM_BUILD_ROOT}/usr/src/%{kernels} ${RPM_BUILD_ROOT}/usr/src/%{module}-%{version}/%{kernels}
 %{?akmod_install}
 
 
