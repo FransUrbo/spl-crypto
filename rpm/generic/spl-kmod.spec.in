@@ -1,4 +1,6 @@
 %define module  @PACKAGE@
+%define ksrc	@LINUX@
+
 #define repo    rpmfusion
 #define repo    chaos
 
@@ -60,7 +62,7 @@ BuildRequires:  %{_bindir}/kmodtool
 # Kmodtool does its magic here.  A patched version of kmodtool is shipped
 # because the latest versions may not be available for your distribution.
 # https://bugzilla.rpmfusion.org/show_bug.cgi?id=2714
-%{expand:%(bash %{SOURCE10} --target %{_target_cpu} %{?repo:--repo %{?repo}} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} --devel %{?prefix:--prefix "%{?prefix}"} %{?kernels:--for-kernels "%{?kernels}"} %{?kernelbuildroot:--buildroot "%{?kernelbuildroot}"} 2>/dev/null) }
+%{expand:%(bash %{SOURCE10} --target %{_target_cpu} %{?repo:--repo %{?repo}} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} --devel %{?prefix:--prefix "%{?prefix}"} %{?kernels:--for-kernels "%{?kernels}"} %{?kernelbuildroot:--buildroot "%{?kernelbuildroot}"} %{?ksrc:--linuxdir "%{?ksrc}"} 2>/dev/null) }
 
 
 %description
@@ -72,7 +74,7 @@ several interfaces provided by the Solaris kernel.
 %{?kmodtool_check}
 
 # Print kmodtool output for debugging purposes:
-bash %{SOURCE10} --target %{_target_cpu} %{?repo:--repo %{?repo}}  --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} --devel  %{?prefix:--prefix "%{?prefix}"} %{?kernels:--for-kernels "%{?kernels}"} %{?kernelbuildroot:--buildroot "%{?kernelbuildroot}"} 2>/dev/null
+bash %{SOURCE10} --target %{_target_cpu} %{?repo:--repo %{?repo}}  --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} --devel  %{?prefix:--prefix "%{?prefix}"} %{?kernels:--for-kernels "%{?kernels}"} %{?kernelbuildroot:--buildroot "%{?kernelbuildroot}"} %{?ksrc:--linuxdir "%{?ksrc}"} 2>/dev/null
 
 %if %{with debug}
     %define debug --enable-debug
@@ -122,6 +124,10 @@ for kernel_version in %{?kernel_versions}; do
         --with-linux="${kernel_version##*___}" \
         --with-linux-obj="${kernel_version##*___}" \
 %else
+%if %{defined ksrc}
+	--with-linux=%{ksrc} \
+	--with-linux-obj=%{ksrc} \
+%else
         --with-linux="$( \
         if [ -e "/lib/modules/${kernel_version%%___*}/source" ]; then \
             echo "/lib/modules/${kernel_version%%___*}/source"; \
@@ -129,6 +135,7 @@ for kernel_version in %{?kernel_versions}; do
             echo "/lib/modules/${kernel_version%%___*}/build"; \
         fi)" \
         --with-linux-obj="/lib/modules/${kernel_version%%___*}/build" \
+%endif
 %endif
         %{debug} \
         %{debug_log} \
